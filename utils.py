@@ -9,6 +9,7 @@ class Generator(object):
 
     Attributes
     ----------
+    mc_size: number of samples used for the Monte-Carlo simulation
 
     """
     def __init__(self, mc_size, w):
