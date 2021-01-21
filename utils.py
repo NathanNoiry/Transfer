@@ -17,6 +17,8 @@ class Generator(object):
 
     matrix_init: the initial matrix transform to be normalized
 
+    mu: the moments of the target to be computed
+
     z: the dataset used for the Monte-Carlo simulation ; z.shape = (mc_size,dim_features(x)+dim_target(y))
 
     norm_factor: the normalization factor computed on z in order to renormalize the initial function func_init
@@ -47,6 +49,7 @@ class Generator(object):
         self.w = w
         self.alpha = alpha
         self.matrix_init = matrix
+        self.mu = np.zeros(3)
 
         self.z = None
         self.norm_factor = None
@@ -90,6 +93,12 @@ class Generator(object):
     def prob_target(self, nb_samples):
         idx = np.random.choice(self.z.shape[0], size=nb_samples, p=self.radon_weights)
         return self.z[idx]
+
+
+    def compute_moments(self):
+        self.mu[0] = 1
+        self.mu[1] = Z_T[:,0].mean()
+        self.mu[2] = Z_T[:,1].mean()
 
 
     def plot_marginals(self,nb_samples):
