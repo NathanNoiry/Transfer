@@ -1,5 +1,4 @@
-import numpy as np 
+from utils.py import Generator
+import parameters as param 
 
-w = np.array([2.,0.8,1.3])
-print(np.__version__)
-print(w)
+
