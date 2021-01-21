@@ -1,4 +1,6 @@
 import numpy as np
+from scipy.stats import gamma, norm
+from scipy.optimize import minimize
 
 
 class Generator(object):
@@ -121,3 +123,60 @@ class Generator(object):
         #plt.savefig('img_transfer')
 
         plt.show()
+
+
+class Optimization(object):
+    """
+    A class used to generate data
+
+    ...
+
+    Attributes
+    ----------    
+    mu: the moments of the target
+
+    M0, M1, M2: empirical moments to be computed
+
+
+    Methods
+    -------
+    psi_emp
+
+    grad_psi_emp
+
+    estimation
+
+    """
+
+    def __init__(self,mu):
+        self.mu = mu
+
+        self.M0 = None
+        self.M1 = None
+        self.M2 = None
+
+
+    def compute_empirical_moments(self,z,matrix):
+        self.M0 = np.array( list(map(matrix,z))).mean(axis=0)
+        self.M1 = np.array([ elem[0]*matrix(elem) for elem in z ]).mean(axis=0)
+        self.M2 = np.array([ elem[1]*matrix(elem) for elem in z ]).mean(axis=0)
+
+
+    def psi_emp(self,alpha): 
+        term0 = alpha.T @ self.M0 @ alpha
+        term1 = alpha.T @ self.M1 @ alpha
+        term2 = alpha.T @ self.M2 @ alpha
+        return (term0-1)**2 + (term1-self.mu[1])**2 + (term2-self.mu[2])**2
+
+
+    def grad_psi_emp(self,alpha):
+        term0 = 2 * (alpha.T @ self.M0 @ alpha - 1) * (self.M0 @ alpha).T
+        term1 = 2 * (alpha.T @ self.M1 @ alpha - self.mu[1]) * (self.M1 @ alpha).T
+        term2 = 2 * (alpha.T @ self.M2 @ alpha - self.mu[2]) * (self.M2 @ alpha).T
+        return term0 + term1 + term2
+
+
+    def estimation(self):
+        res = minimize(self.psi_emp,np.random.randn(3),jac=self.grad_psi_emp,method='BFGS')
+        return np.abs(res.x)
+
