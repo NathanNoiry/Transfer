@@ -90,3 +90,25 @@ class Generator(object):
     def prob_target(self, nb_samples):
         idx = np.random.choice(self.z.shape[0], size=nb_samples, p=self.radon_weights)
         return self.z[idx]
+
+
+    def plot_marginals(self,nb_samples):
+        z_s = generator.prob_source(nb_samples)
+        Z_T = generator.prob_target(nb_samples)
+        plt.figure(figsize=(20,5))
+
+        plt.subplot(1,3,1)
+        plt.hist(Z_S[:,0],bins=40,rwidth=0.8,alpha=0.5,density=True)
+        plt.hist(Z_T[:,0],bins=40,rwidth=0.8,alpha=0.5,density=True)
+
+        plt.subplot(1,3,2)
+        plt.hist(Z_S[:,1],bins=40,rwidth=0.8,alpha=0.5,density=True)
+        plt.hist(Z_T[:,1],bins=40,rwidth=0.8,alpha=0.5,density=True)
+
+        plt.subplot(1,3,3)
+        plt.hist(Z_S[:,2],bins=40,rwidth=0.8,alpha=0.5,density=True)
+        plt.hist(Z_T[:,2],bins=40,rwidth=0.8,alpha=0.5,density=True)
+
+        #plt.savefig('img_transfer')
+
+        plt.show()
