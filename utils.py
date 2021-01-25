@@ -98,13 +98,15 @@ class Generator(object):
 
 
     def compute_moments(self):
+        idx = np.random.choice(self.z.shape[0], size=self.mc_size, p=self.radon_weights)
+        z_t = self.z[idx]
         self.mu[0] = 1
-        self.mu[1] = Z_T[:,0].mean()
-        self.mu[2] = Z_T[:,1].mean()
+        self.mu[1] = z_t[:,0].mean()
+        self.mu[2] = z_t[:,1].mean()
 
 
     def plot_marginals(self,nb_samples):
-        z_s = generator.prob_source(nb_samples)
+        Z_s = generator.prob_source(nb_samples)
         Z_T = generator.prob_target(nb_samples)
         plt.figure(figsize=(20,5))
 
