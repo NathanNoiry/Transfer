@@ -31,25 +31,29 @@ generator.compute_weights()
 #compute the moments
 generator.compute_moments()
 
-#plot marginals
-#generator.plot_marginals(100000)
-
-
-#print(generator.mu, generator.norm_factor)
 
 #instantiate the class
-optim = Optimization(generator.mu)
+optim = Optimization(generator.mu) 
 
-matrix = generator.matrix_normalized
-
+#get the parameters from parameters.py
 n_repet = param.n_repet
 sample_size = param.sample_size
 sub_sample_size = param.sub_sample_size
 
+#name the matrix
+matrix = generator.matrix_normalized
+
+#get a sample
 Z_S = generator.prob_source(sample_size)
 
-alpha_emp = optim.estimation(Z_S,matrix,sample_size,sub_sample_size,n_repet)
+alpha_emp = optim.estimation(Z_S,
+	                         matrix,
+	                         sample_size,
+	                         sub_sample_size,
+	                         n_repet)
 
 print(alpha_emp)
 
 
+#plot marginals
+#generator.plot_marginals(100000)
