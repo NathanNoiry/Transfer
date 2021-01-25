@@ -2,16 +2,27 @@ from utils import Generator, Optimization
 import parameters as param 
 import numpy as np
 
-#import the parameters
+
+# Seed initialization
+np.random.seed(seed=1)
+
+#############################################################
+##################### IMPORT PARAMETERS #####################
+#############################################################
+
 mc_size = param.mc_size
 w = param.w
 alpha_true = param.alpha_true
 
+n_repet = param.n_repet
+sample_size = param.sample_size
+sub_sample_size = param.sub_sample_size
+
 matrix_init = param.matrix_init
 
-
-# Seed initialization
-np.random.seed(seed=1)
+#############################################################
+################## STEP 0: DATA GENERATION ##################
+#############################################################
 
 #instantiate the generator class
 generator = Generator(param.mc_size, 
@@ -31,20 +42,15 @@ generator.compute_weights()
 #compute the moments
 generator.compute_moments()
 
+#############################################################
+################## STEP 1: ALPHA ESTIMATION #################
+#############################################################
 
 #instantiate the class
 optim = Optimization(generator.mu) 
 
-#get the parameters from parameters.py
-n_repet = param.n_repet
-sample_size = param.sample_size
-sub_sample_size = param.sub_sample_size
-
-#name the matrix
-matrix = generator.matrix_normalized
-
-#get a sample
 Z_S = generator.prob_source(sample_size)
+matrix = generator.matrix_normalized
 
 alpha_emp = optim.estimation(Z_S,
 	                         matrix,
@@ -53,6 +59,11 @@ alpha_emp = optim.estimation(Z_S,
 	                         n_repet)
 
 print(alpha_emp)
+
+
+#############################################################
+######################## STEP 2: ERM ########################
+#############################################################
 
 
 #plot marginals
