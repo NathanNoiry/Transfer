@@ -1,6 +1,7 @@
 import numpy as np
 from scipy.stats import gamma, norm
 from scipy.optimize import minimize
+import matplotlib.pyplot as plt
 
 
 class Generator(object):
@@ -66,7 +67,7 @@ class Generator(object):
 
         eps = np.random.randn(self.mc_size)
 
-        y = self.w[0] * x[:, 0] + self.w[1] * x[:, 1] + self.w[2] * x[:, 0] * x[:, 1] + eps
+        y = 0.5*(self.w[0] * x[:, 0] + self.w[1] * x[:, 1] + self.w[2] * x[:, 0] * x[:, 1]) + eps
         self.z = np.c_[x, y]
 
 
@@ -106,8 +107,8 @@ class Generator(object):
 
 
     def plot_marginals(self,nb_samples):
-        Z_s = generator.prob_source(nb_samples)
-        Z_T = generator.prob_target(nb_samples)
+        Z_S = self.prob_source(nb_samples)
+        Z_T = self.prob_target(nb_samples)
         plt.figure(figsize=(20,5))
 
         plt.subplot(1,3,1)
@@ -181,4 +182,6 @@ class Optimization(object):
     def estimation(self):
         res = minimize(self.psi_emp,np.random.randn(3),jac=self.grad_psi_emp,method='BFGS')
         return np.abs(res.x)
+
+
 
