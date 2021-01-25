@@ -42,28 +42,14 @@ optim = Optimization(generator.mu)
 
 matrix = generator.matrix_normalized
 
-n_repet = 100
-sample_size = 200000
-sub_sample_size = 40000
-alpha_est = []
-psi_emp_est = []
+n_repet = param.n_repet
+sample_size = param.sample_size
+sub_sample_size = param.sub_sample_size
 
 Z_S = generator.prob_source(sample_size)
 
-for i in range(n_repet):
-    idx = np.random.randint(Z_S.shape[0], size=sub_sample_size)
-    Z_boot = Z_S[idx]
-    #Z_S = generator.prob_source(sample_size)
-    optim.compute_empirical_moments(Z_boot,matrix)
-    res = optim.estimation()
-    alpha_est.append(res)
-    psi_emp_est.append(optim.psi_emp(res))
+alpha_emp = optim.estimation(Z_S,matrix,sample_size,sub_sample_size,n_repet)
 
-x = np.array(alpha_est)
-x = np.abs(x)
-print(x.mean(axis=0),x.std(axis=0),np.median(x,axis=0))
-
-idx = np.argmin(psi_emp_est)
-print(alpha_est[idx])
+print(alpha_emp)
 
 

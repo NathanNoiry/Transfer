@@ -159,6 +159,8 @@ class Optimization(object):
         self.M2 = None
 
 
+
+
     def compute_empirical_moments(self,z,matrix):
         self.M0 = np.array( list(map(matrix,z))).mean(axis=0)
         self.M1 = np.array([ elem[0]*matrix(elem) for elem in z ]).mean(axis=0)
@@ -179,9 +181,29 @@ class Optimization(object):
         return term0 + term1 + term2
 
 
-    def estimation(self):
-        res = minimize(self.psi_emp,np.random.randn(3),jac=self.grad_psi_emp,method='BFGS')
-        return np.abs(res.x)
+    #def estimation(self):
+    #    res = minimize(self.psi_emp,np.random.randn(3),jac=self.grad_psi_emp,method='BFGS')
+    #    return np.abs(res.x)
+
+    def estimation(self,z,matrix,sample_size,sub_sample_size,n_repet):
+
+        alpha_est = []
+        psi_emp_est = []
+
+        for i in range(n_repet):
+            idx = np.random.randint(z.shape[0], size=sub_sample_size)
+            z_boot = z[idx]
+            #Z_S = generator.prob_source(sample_size)
+            self.compute_empirical_moments(z_boot,matrix)
+            res = np.abs(minimize(self.psi_emp,np.random.randn(3),jac=self.grad_psi_emp,method='BFGS').x)
+            alpha_est.append(res)
+            psi_emp_est.append(self.psi_emp(res))
+
+        idx = np.argmin(psi_emp_est)
+        alpha_emp = alpha_est[idx]
+        return alpha_emp
+        
+
 
 
 
