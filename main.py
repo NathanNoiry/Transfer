@@ -6,6 +6,8 @@ import numpy as np
 # Seed initialization
 np.random.seed(seed=1)
 
+
+
 #############################################################
 ##################### IMPORT PARAMETERS #####################
 #############################################################
@@ -19,6 +21,12 @@ sample_size = param.sample_size
 sub_sample_size = param.sub_sample_size
 
 matrix_init = param.matrix_init
+
+
+# Define the lists to be saved
+
+list_alpha = []
+list_erm = []
 
 #############################################################
 ################## STEP 0: DATA GENERATION ##################
