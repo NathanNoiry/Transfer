@@ -1,11 +1,15 @@
 from utils import Generator, Optimization
 import parameters as param 
+import pandas as pd
 import numpy as np
+from sklearn.metrics import mean_squared_error
+from sklearn.svm import SVR
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.linear_model import LinearRegression
 
 
 # Seed initialization
 np.random.seed(seed=1)
-
 
 
 #############################################################
@@ -22,11 +26,24 @@ sub_sample_size = param.sub_sample_size
 
 matrix_init = param.matrix_init
 
+optim_method = param.optim_method
+ml_algo = param.ml_algo
 
 # Define the lists to be saved
 
-list_alpha = []
-list_erm = []
+list_alpha_erm = []
+
+#add parameters
+#list_alpha_erm.append([[ [f'mc_size={mc_size}'],
+#						 [f'alpha_true={alpha_true}'],
+#						 [f'ml_algo={ml_algo}'],
+#						 [f'n_loop={param.n_loop}'],
+#						 [f'n_repet={n_repet}'],
+#						 [f'sample_size={sample_size}'],
+#						 [f'sub_sample_size={sub_sample_size}'],
+#						 [f'matrix_init={matrix_init}']
+#						 ],
+#						0,0,0])
 
 #############################################################
 ################## STEP 0: DATA GENERATION ##################
@@ -50,29 +67,150 @@ generator.compute_weights()
 #compute the moments
 generator.compute_moments()
 
+#################### START THE REPETITIONS ##################
+
+for i in range(param.n_loop):
+
 #############################################################
 ################## STEP 1: ALPHA ESTIMATION #################
 #############################################################
 
-#instantiate the class
-optim = Optimization(generator.mu) 
+	#draw a sample from the source
+	Z_S = generator.prob_source(sample_size)
+	matrix = generator.matrix_normalized
 
-Z_S = generator.prob_source(sample_size)
-matrix = generator.matrix_normalized
+	#instantiate the class and compute moments based on Z_S
+	optim = Optimization(generator.mu)
+	optim.compute_empirical_moments(Z_S,matrix)
 
-alpha_emp = optim.estimation(Z_S,
-	                         matrix,
-	                         sample_size,
-	                         sub_sample_size,
-	                         n_repet)
+    #another instance of the class for the bootstrap procedure
+	optim_boot = Optimization(generator.mu)
 
-print(alpha_emp)
+	alpha_est = []
+	psi_emp_est = []
 
+	for n in range(n_repet):
+		if optim_method == 'boot_on_sample':
+
+			idx = np.random.randint(Z_S.shape[0], size=sub_sample_size)
+			z_boot = Z_S[idx]
+
+			optim_boot.compute_empirical_moments(z_boot,matrix)
+			res = optim_boot.estimation()
+
+			alpha_est.append(res)
+			psi_emp_est.append(optim.psi_emp(res))
+
+		elif optim_method == 'boot_on_init':
+
+		    res = optim.estimation()
+
+		    alpha_est.append(res)
+		    psi_emp_est.append(optim.psi_emp(res))
+
+	idx = np.argmin(psi_emp_est)
+	alpha_emp = alpha_est[idx]
 
 #############################################################
 ######################## STEP 2: ERM ########################
 #############################################################
 
+	#compute empirical weights
+	weight_emp = np.array([ alpha_emp.T @ 
+		                    generator.matrix_normalized(elem) @ 
+	                        alpha_emp for elem in Z_S ])
+
+	#source sample
+	X_S, y_S = Z_S[:,:2], Z_S[:,2]
+
+	#target sample
+	Z_T = generator.prob_target(sample_size)
+	X_T, y_T = Z_T[:,:2], Z_T[:,2]
+
+	#test sample
+	Z_test = generator.prob_target(500) 
+	X_test, y_test = Z_test[:,:2], Z_test[:,2]
+
+	if ml_algo == 'svm':
+		svm1 = SVR()
+		svm1.fit(X_S,y_S,weight_emp)
+
+		svm2 = SVR()
+		svm2.fit(X_T,y_T)
+
+		svm3 = SVR()
+		svm3.fit(X_S,y_S)
+
+		y_pred_1 = svm1.predict(X_test)
+		y_pred_2 = svm2.predict(X_test)
+		y_pred_3 = svm3.predict(X_test)
+
+		mse1 = mean_squared_error(y_test,y_pred_1)
+		mse2 = mean_squared_error(y_test,y_pred_2)
+		mse3 = mean_squared_error(y_test,y_pred_3)
+
+	elif ml_algo == 'rf':
+		svm1 = RandomForestRegressor(param.n_estimators, 
+									 criterion='mse', 
+									 max_depth=param.max_depth)
+		svm1.fit(X_S,y_S,weight_emp)
+
+		svm2 = RandomForestRegressor(param.n_estimators, 
+									 criterion='mse', 
+									 max_depth=param.max_depth)
+		svm2.fit(X_T,y_T)
+
+		svm3 = RandomForestRegressor(param.n_estimators, 
+									 criterion='mse', 
+									 max_depth=param.max_depth)
+		svm3.fit(X_S,y_S)
+
+		y_pred_1 = svm1.predict(X_test)
+		y_pred_2 = svm2.predict(X_test)
+		y_pred_3 = svm3.predict(X_test)
+
+		mse1 = mean_squared_error(y_test,y_pred_1)
+		mse2 = mean_squared_error(y_test,y_pred_2)
+		mse3 = mean_squared_error(y_test,y_pred_3)
+
+	elif ml_algo == 'ols':
+		lin1 = LinearRegression()
+		lin1.fit(X_S,y_S,weight_emp)
+
+		lin2 = LinearRegression()
+		lin2.fit(X_T,y_T)
+
+		lin3 = LinearRegression()
+		lin3.fit(X_S,y_S)
+
+		y_pred_1 = lin1.predict(X_test)
+		y_pred_2 = lin2.predict(X_test)
+		y_pred_3 = lin3.predict(X_test)
+
+		mse1 = mean_squared_error(y_test,y_pred_1)
+		mse2 = mean_squared_error(y_test,y_pred_2)
+		mse3 = mean_squared_error(y_test,y_pred_3)
+
+
+	list_alpha_erm.append([alpha_emp[0], 
+						   alpha_emp[1],
+						   alpha_emp[2],
+						   mse1, mse2, mse3])
+
+	print(i)
+
+##################### END THE REPETITIONS ###################
+
+
+df = pd.DataFrame(list_alpha_erm)
+df.columns = ['alpha_best_1',
+			  'alpha_best_2',
+			  'alpha_best_3',
+			  'mse_w_S','mse_T','mse_S']
+
+df.to_csv('transfer_{}_{}_{}_{}_{}_{}.csv'.format(ml_algo,
+	mc_size,sample_size,sub_sample_size,param.n_loop,n_repet), 
+	index=False)
 
 #plot marginals
 #generator.plot_marginals(100000)

@@ -112,16 +112,23 @@ class Generator(object):
         plt.figure(figsize=(20,5))
 
         plt.subplot(1,3,1)
-        plt.hist(Z_S[:,0],bins=40,rwidth=0.8,alpha=0.5,density=True)
-        plt.hist(Z_T[:,0],bins=40,rwidth=0.8,alpha=0.5,density=True)
+        plt.xlim(-4.5,4.5)
+        plt.xlabel('Feature first marginal')
+        plt.ylabel('Density')
+        plt.hist(Z_S[:,0],bins=35,rwidth=0.8,alpha=0.5,density=True)
+        plt.hist(Z_T[:,0],bins=35,rwidth=0.8,alpha=0.5,density=True)
 
         plt.subplot(1,3,2)
-        plt.hist(Z_S[:,1],bins=40,rwidth=0.8,alpha=0.5,density=True)
-        plt.hist(Z_T[:,1],bins=40,rwidth=0.8,alpha=0.5,density=True)
+        plt.xlim(-0.5,14)
+        plt.xlabel('Feature second marginal')
+        plt.hist(Z_S[:,1],bins=35,rwidth=0.8,alpha=0.5,density=True)
+        plt.hist(Z_T[:,1],bins=35,rwidth=0.8,alpha=0.5,density=True)
 
         plt.subplot(1,3,3)
-        plt.hist(Z_S[:,2],bins=40,rwidth=0.8,alpha=0.5,density=True)
-        plt.hist(Z_T[:,2],bins=40,rwidth=0.8,alpha=0.5,density=True)
+        plt.xlim(-18,24)
+        plt.xlabel('Target marginal')
+        plt.hist(Z_S[:,2],bins=35,rwidth=0.8,alpha=0.5,density=True)
+        plt.hist(Z_T[:,2],bins=35,rwidth=0.8,alpha=0.5,density=True)
 
         #plt.savefig('img_transfer')
 
@@ -159,8 +166,6 @@ class Optimization(object):
         self.M2 = None
 
 
-
-
     def compute_empirical_moments(self,z,matrix):
         self.M0 = np.array( list(map(matrix,z))).mean(axis=0)
         self.M1 = np.array([ elem[0]*matrix(elem) for elem in z ]).mean(axis=0)
@@ -181,27 +186,10 @@ class Optimization(object):
         return term0 + term1 + term2
 
 
-    #def estimation(self):
-    #    res = minimize(self.psi_emp,np.random.randn(3),jac=self.grad_psi_emp,method='BFGS')
-    #    return np.abs(res.x)
+    def estimation(self):
+        res = minimize(self.psi_emp,np.random.randn(3),jac=self.grad_psi_emp,method='BFGS')
+        return np.abs(res.x)
 
-    def estimation(self,z,matrix,sample_size,sub_sample_size,n_repet):
-
-        alpha_est = []
-        psi_emp_est = []
-
-        for i in range(n_repet):
-            idx = np.random.randint(z.shape[0], size=sub_sample_size)
-            z_boot = z[idx]
-            #Z_S = generator.prob_source(sample_size)
-            self.compute_empirical_moments(z_boot,matrix)
-            res = np.abs(minimize(self.psi_emp,np.random.randn(3),jac=self.grad_psi_emp,method='BFGS').x)
-            alpha_est.append(res)
-            psi_emp_est.append(self.psi_emp(res))
-
-        idx = np.argmin(psi_emp_est)
-        alpha_emp = alpha_est[idx]
-        return alpha_emp
         
 
 
