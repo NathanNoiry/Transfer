@@ -11,12 +11,12 @@ def compute_matrix(q, x, i, j):
     return cnt, l
 
 
-def prob_source(nb_samples, weight):
+def prob_source(vec, nb_samples, weight):
     l = []
     for n in range(nb_samples):       
         x = np.random.choice(36, p=weight)
         idx = np.random.choice(list_idx[x])
-        l.append(arr_df[idx])
+        l.append(vec[idx])
     return np.array(l)
 
 
