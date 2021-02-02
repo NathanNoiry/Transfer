@@ -5,6 +5,12 @@ n_loop = 100
 n_repet = 100
 
 
+def matrix(Z):
+    W = np.array([[Z[0]**2,0],
+                  [0, Z[2]**2]])
+    return W
+
+
 prob_grid = np.zeros((6,6))
 
 prob_grid[0] = [0.05, 0.08, 0.04, 0.04, 0.01, 0.00]
