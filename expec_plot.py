@@ -6,6 +6,9 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1 import ImageGrid
 from mpl_toolkits.axes_grid1.inset_locator import InsetPosition
 
+# Seed initialization
+np.random.seed(seed=1)
+
 #import parameter
 weight = param.weight
 prob_grid = param.prob_grid
