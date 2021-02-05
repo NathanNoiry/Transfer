@@ -19,8 +19,8 @@ matrix = param.matrix
 
 #Load data and preprocess
 df = pd.read_csv('Life_Expectancy_Data.csv')
-df_clean = df[['Adult Mortality','Alcohol', 'Life expectancy ']]
-df_clean.columns = ['adult_mortality','alcohol', 'life_expec']
+df_clean = df[['Adult Mortality', 'Alcohol', 'Life expectancy ']]
+df_clean.columns = ['adult_mortality', 'alcohol', 'life_expec']
 
 df_clean = df_clean.dropna()
 
