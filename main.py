@@ -6,6 +6,7 @@ from sklearn.metrics import mean_squared_error
 from sklearn.svm import SVR
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.linear_model import LinearRegression
+from time import time
 
 
 # Seed initialization
@@ -54,6 +55,9 @@ generator.compute_weights()
 #compute the moments
 generator.compute_moments()
 
+#Tracking times of execution
+time = []
+
 #################### START THE REPETITIONS ##################
 
 for i in range(param.n_loop):
@@ -61,6 +65,8 @@ for i in range(param.n_loop):
 #############################################################
 ################## STEP 1: ALPHA ESTIMATION #################
 #############################################################
+	
+	time_generation0 = time()
 
 	#draw a sample from the source
 	Z_S = generator.prob_source(sample_size)
@@ -73,36 +79,36 @@ for i in range(param.n_loop):
     #another instance of the class for the bootstrap procedure
 	optim_boot = Optimization(generator.mu)
 
+	time_generation1 = time() - time_generation0
+
 	alpha_est = []
 	psi_emp_est = []
 
+	time_est_alpha0 = time()
 	for n in range(n_repet):
 		if optim_method == 'boot_on_sample':
-
 			idx = np.random.randint(Z_S.shape[0], 
 				                    size=sub_sample_size)
 			z_boot = Z_S[idx]
-
 			optim_boot.compute_empirical_moments(z_boot,matrix)
 			res = optim_boot.estimation()
-
 			alpha_est.append(res)
 			psi_emp_est.append(optim.psi_emp(res))
 
 		elif optim_method == 'boot_on_init':
-
 		    res = optim.estimation()
-
 		    alpha_est.append(res)
 		    psi_emp_est.append(optim.psi_emp(res))
 
 	idx = np.argmin(psi_emp_est)
 	alpha_emp = alpha_est[idx]
+	time_est_alpha1 = time() - time_est_alpha0
 
 #############################################################
 ######################## STEP 2: ERM ########################
 #############################################################
-
+	
+	time_rw_erm0 = time()
 	#compute empirical weights
 	weight_emp = np.array([ alpha_emp.T @ 
 		                    generator.matrix_normalized(elem) @ 
@@ -179,11 +185,15 @@ for i in range(param.n_loop):
 		mse2 = mean_squared_error(y_test,y_pred_2)
 		mse3 = mean_squared_error(y_test,y_pred_3)
 
+	time_rw_erm1 = time() - time_rw_erm0
+
 
 	list_alpha_erm.append([alpha_emp[0], 
 						   alpha_emp[1],
 						   alpha_emp[2],
 						   mse1, mse2, mse3])
+
+	time.append([time_generation1, time_est_alpha1, time_rw_erm1])
 
 	print(i)
 
@@ -196,6 +206,12 @@ df.columns = ['alpha_best_1',
 			  'alpha_best_3',
 			  'mse_w_S','mse_T','mse_S']
 
+df_time = pd.DataFrame(time)
+df_time.columns = ['data_gen', 'est_alpha', 'rw_erm']
+
 df.to_csv('transfer_{}_{}_{}_{}_{}_{}.csv'.format(ml_algo,
+	mc_size,sample_size,sub_sample_size,param.n_loop,n_repet), 
+	index=False)
+df_time.to_csv('transfer_times_{}_{}_{}_{}_{}_{}.csv'.format(ml_algo,
 	mc_size,sample_size,sub_sample_size,param.n_loop,n_repet), 
 	index=False)
