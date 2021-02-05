@@ -30,20 +30,7 @@ optim_method = param.optim_method
 ml_algo = param.ml_algo
 
 # Define the lists to be saved
-
 list_alpha_erm = []
-
-#add parameters
-#list_alpha_erm.append([[ [f'mc_size={mc_size}'],
-#						 [f'alpha_true={alpha_true}'],
-#						 [f'ml_algo={ml_algo}'],
-#						 [f'n_loop={param.n_loop}'],
-#						 [f'n_repet={n_repet}'],
-#						 [f'sample_size={sample_size}'],
-#						 [f'sub_sample_size={sub_sample_size}'],
-#						 [f'matrix_init={matrix_init}']
-#						 ],
-#						0,0,0])
 
 #############################################################
 ################## STEP 0: DATA GENERATION ##################
@@ -92,7 +79,8 @@ for i in range(param.n_loop):
 	for n in range(n_repet):
 		if optim_method == 'boot_on_sample':
 
-			idx = np.random.randint(Z_S.shape[0], size=sub_sample_size)
+			idx = np.random.randint(Z_S.shape[0], 
+				                    size=sub_sample_size)
 			z_boot = Z_S[idx]
 
 			optim_boot.compute_empirical_moments(z_boot,matrix)
@@ -211,6 +199,3 @@ df.columns = ['alpha_best_1',
 df.to_csv('transfer_{}_{}_{}_{}_{}_{}.csv'.format(ml_algo,
 	mc_size,sample_size,sub_sample_size,param.n_loop,n_repet), 
 	index=False)
-
-#plot marginals
-#generator.plot_marginals(100000)
