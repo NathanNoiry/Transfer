@@ -56,7 +56,7 @@ generator.compute_weights()
 generator.compute_moments()
 
 #Tracking times of execution
-time = []
+list_time = []
 
 #################### START THE REPETITIONS ##################
 
@@ -193,7 +193,7 @@ for i in range(param.n_loop):
 						   alpha_emp[2],
 						   mse1, mse2, mse3])
 
-	time.append([time_generation1, time_est_alpha1, time_rw_erm1])
+	list_time.append([time_generation1, time_est_alpha1, time_rw_erm1])
 
 	print(i)
 
@@ -206,12 +206,12 @@ df.columns = ['alpha_best_1',
 			  'alpha_best_3',
 			  'mse_w_S','mse_T','mse_S']
 
-df_time = pd.DataFrame(time)
+df_time = pd.DataFrame(list_time)
 df_time.columns = ['data_gen', 'est_alpha', 'rw_erm']
 
-df.to_csv('transfer_{}_{}_{}_{}_{}_{}.csv'.format(ml_algo,
+df.to_csv('./results/transfer_{}_{}_{}_{}_{}_{}_binit.csv'.format(ml_algo,
 	mc_size,sample_size,sub_sample_size,param.n_loop,n_repet), 
 	index=False)
-df_time.to_csv('transfer_times_{}_{}_{}_{}_{}_{}.csv'.format(ml_algo,
+df_time.to_csv('./results/transfer_times_{}_{}_{}_{}_{}_{}_binit.csv'.format(ml_algo,
 	mc_size,sample_size,sub_sample_size,param.n_loop,n_repet), 
 	index=False)
