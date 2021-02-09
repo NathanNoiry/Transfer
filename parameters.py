@@ -7,7 +7,7 @@ w = np.array([2.,0.8,1.3])
 alpha_true = np.array([1.,1.,2.])
 
 n_repet = 100
-sample_size = 32000
+sample_size = 250
 sub_sample_size = int(sample_size / 5)
 
 #choose the optimization method

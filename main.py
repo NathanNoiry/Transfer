@@ -108,11 +108,12 @@ for i in range(param.n_loop):
 ######################## STEP 2: ERM ########################
 #############################################################
 	
-	time_rw_erm0 = time()
+	time_weight0 = time()
 	#compute empirical weights
 	weight_emp = np.array([ alpha_emp.T @ 
 		                    generator.matrix_normalized(elem) @ 
 	                        alpha_emp for elem in Z_S ])
+	time_weight1 = time() - time_weight0
 
 	#source sample
 	X_S, y_S = Z_S[:,:2], Z_S[:,2]
@@ -125,43 +126,54 @@ for i in range(param.n_loop):
 	Z_test = generator.prob_target(500) 
 	X_test, y_test = Z_test[:,:2], Z_test[:,2]
 
+	time_erm_fit0 = time()
+
 	if ml_algo == 'svm':
 		svm1 = SVR()
 		svm1.fit(X_S,y_S,weight_emp)
+		time_fit_Rw = time() - time_erm_fit0
 
 		svm2 = SVR()
 		svm2.fit(X_T,y_T)
+		time_fit_T = time() - time_fit_Rw
 
 		svm3 = SVR()
 		svm3.fit(X_S,y_S)
+		time_fit_S = time() - time_fit_T
 
+		time_erm_predict0 = time()
 		y_pred_1 = svm1.predict(X_test)
+		time_predict_Rw = time() - time_erm_predict0
+
 		y_pred_2 = svm2.predict(X_test)
+		time_predict_T = time() - time_predict_Rw
+
 		y_pred_3 = svm3.predict(X_test)
+		time_predict_S = time() - time_predict_T
 
 		mse1 = mean_squared_error(y_test,y_pred_1)
 		mse2 = mean_squared_error(y_test,y_pred_2)
 		mse3 = mean_squared_error(y_test,y_pred_3)
 
 	elif ml_algo == 'rf':
-		svm1 = RandomForestRegressor(param.n_estimators, 
+		rf1 = RandomForestRegressor(param.n_estimators, 
 									 criterion='mse', 
 									 max_depth=param.max_depth)
-		svm1.fit(X_S,y_S,weight_emp)
+		rf1.fit(X_S,y_S,weight_emp)
 
-		svm2 = RandomForestRegressor(param.n_estimators, 
+		rf2 = RandomForestRegressor(param.n_estimators, 
 									 criterion='mse', 
 									 max_depth=param.max_depth)
-		svm2.fit(X_T,y_T)
+		rf2.fit(X_T,y_T)
 
-		svm3 = RandomForestRegressor(param.n_estimators, 
+		rf3 = RandomForestRegressor(param.n_estimators, 
 									 criterion='mse', 
 									 max_depth=param.max_depth)
-		svm3.fit(X_S,y_S)
+		rf3.fit(X_S,y_S)
 
-		y_pred_1 = svm1.predict(X_test)
-		y_pred_2 = svm2.predict(X_test)
-		y_pred_3 = svm3.predict(X_test)
+		y_pred_1 = rf1.predict(X_test)
+		y_pred_2 = rf2.predict(X_test)
+		y_pred_3 = rf3.predict(X_test)
 
 		mse1 = mean_squared_error(y_test,y_pred_1)
 		mse2 = mean_squared_error(y_test,y_pred_2)
