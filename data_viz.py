@@ -3,8 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-grid_param = ['250_50','500_100',
-              '1000_200','2000_400',
+grid_param = ['1000_200','2000_400',
               '4000_800','8000_1600',
               '16000_3200','32000_6400']
 
@@ -26,7 +25,8 @@ mean_m = mean - std
 plt.figure(figsize=(5,5))
 
 x = np.arange(mean.shape[0])
-plt.xticks(np.arange(8), (str(250*2**i) for i in range(8)) )
+
+plt.xticks(np.arange(6), (str(250*2**(i+2)) for i in range(6)) )
 plt.xlabel('Training size')
 plt.ylabel('Time in seconds')
 
@@ -36,6 +36,11 @@ plt.plot(mean_m,color='lightblue')
 plt.fill_between(x, mean_m, mean_p, color='lightblue', alpha=0.6)
 plt.show()
 
+
+grid_param = ['500_100',
+              '1000_200','2000_400',
+              '4000_800','8000_1600',
+              '16000_3200','32000_6400']
 
 plt.figure(figsize=(15,8))
 #MSE scores with ols
@@ -56,7 +61,7 @@ mean_T, std_T = list_mse_mean_ols[:,4], list_mse_std_ols[:,4]
 mean_S, std_S = list_mse_mean_ols[:,5], list_mse_std_ols[:,5]
 
 x = np.arange(mean_wS.shape[0])
-plt.xticks(np.arange(8), (str(250*2**i) for i in range(8)), rotation=45)
+plt.xticks(np.arange(7), (str(250*2**(i+1)) for i in range(7)), rotation=45)
 plt.xlabel('Training size')
 plt.ylabel('MSE score')
 
@@ -94,7 +99,7 @@ mean_T, std_T = list_mse_mean_svr[:,4], list_mse_std_svr[:,4]
 mean_S, std_S = list_mse_mean_svr[:,5], list_mse_std_svr[:,5]
 
 x = np.arange(mean_wS.shape[0])
-plt.xticks(np.arange(8), (str(250*2**i) for i in range(8)), rotation=45)
+plt.xticks(np.arange(7), (str(250*2**(i+1)) for i in range(7)), rotation=45)
 plt.xlabel('Training size')
 #plt.ylabel('MSE score')
 
@@ -132,7 +137,7 @@ mean_T, std_T = list_mse_mean_rf[:,4], list_mse_std_rf[:,4]
 mean_S, std_S = list_mse_mean_rf[:,5], list_mse_std_rf[:,5]
 
 x = np.arange(mean_wS.shape[0])
-plt.xticks(np.arange(8), (str(250*2**i) for i in range(8)), rotation=45)
+plt.xticks(np.arange(7), (str(250*2**(i+1)) for i in range(7)), rotation=45)
 plt.xlabel('Training size')
 #plt.ylabel('MSE score')
 

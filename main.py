@@ -123,7 +123,7 @@ for i in range(param.n_loop):
 	X_T, y_T = Z_T[:,:2], Z_T[:,2]
 
 	#test sample
-	Z_test = generator.prob_target(500) 
+	Z_test = generator.prob_target(int(sample_size/20)) 
 	X_test, y_test = Z_test[:,:2], Z_test[:,2]
 
 	time_erm_fit0 = time()
@@ -210,20 +210,19 @@ for i in range(param.n_loop):
 
 		y_pred_3 = lin3.predict(X_test)
 		time_predict_S = time() - time_predict_T
-		
+
 		mse1 = mean_squared_error(y_test,y_pred_1)
 		mse2 = mean_squared_error(y_test,y_pred_2)
 		mse3 = mean_squared_error(y_test,y_pred_3)
-
-	time_rw_erm1 = time() - time_rw_erm0
-
 
 	list_alpha_erm.append([alpha_emp[0], 
 						   alpha_emp[1],
 						   alpha_emp[2],
 						   mse1, mse2, mse3])
 
-	list_time.append([time_generation1, time_est_alpha1, time_rw_erm1])
+	list_time.append([time_generation1, time_est_alpha1, time_weight1, 
+		              time_fit_Rw, time_fit_T, time_fit_S,
+		              time_predict_Rw, time_predict_T, time_predict_S])
 
 	print(i)
 
@@ -237,7 +236,9 @@ df.columns = ['alpha_best_1',
 			  'mse_w_S','mse_T','mse_S']
 
 df_time = pd.DataFrame(list_time)
-df_time.columns = ['data_gen', 'est_alpha', 'rw_erm']
+df_time.columns = ['data_gen', 'est_alpha', 'time_weight',
+				   'fit_Rw', 'fit_T', 'fit_S',
+				   'pred_Rw', 'pred_T', 'pred_S']
 
 df.to_csv('./results/transfer_{}_{}_{}_{}_{}_{}_binit.csv'.format(ml_algo,
 	mc_size,sample_size,sub_sample_size,param.n_loop,n_repet), 

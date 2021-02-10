@@ -7,7 +7,7 @@ w = np.array([2.,0.8,1.3])
 alpha_true = np.array([1.,1.,2.])
 
 n_repet = 100
-sample_size = 250
+sample_size = 32000
 sub_sample_size = int(sample_size / 5)
 
 #choose the optimization method
@@ -17,7 +17,7 @@ optim_method = optim_choices[1]
 
 #choose the ml algorithm
 algo_choices = ['ols','svm','rf']
-ml_algo = algo_choices[0]
+ml_algo = algo_choices[1]
 
 #parameters for ml_algo = 'rf'
 n_estimators = 100
