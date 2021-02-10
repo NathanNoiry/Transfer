@@ -22,11 +22,12 @@ df = pd.read_csv('Life_Expectancy_Data.csv')
 df_clean = df[['Adult Mortality', 'Alcohol', 'Life expectancy ']]
 df_clean.columns = ['adult_mortality', 'alcohol', 'life_expec']
 
+#Delete rows containing NaN values
 df_clean = df_clean.dropna()
 
+#Normalize the DataFrame
 normalized_df=(df_clean-df_clean.mean())/df_clean.std()
 size_data = normalized_df.shape[0]
-
 
 #Compute moments
 mu = np.zeros(3)
@@ -34,28 +35,23 @@ mu[0] = 1
 mu[1] = normalized_df['adult_mortality'].mean()
 mu[2] = normalized_df['life_expec'].mean()
 
-
 #Compute quantile
 q_df = normalized_df[['adult_mortality','life_expec']].quantile([0.25,0.325,0.5,0.625,0.75])
 arr_quantile = np.array(q_df)
 arr_quantile = np.vstack((np.array([-10,-10]),arr_quantile,np.array([100,100])))
 
-
-###########################################################
-##################### START THE LOOP ######################
-###########################################################
-
+#Start the loop
 scores_lin = []
 scores_svr = []
 for n in range(n_loop):
 
-	#train/test
+	#Divide in train/test
 	idx_test = np.random.choice(size_data,size=int(size_data*0.1),replace=False)
 	idx_used = np.delete(np.arange(size_data),idx_test)
 	df_test = normalized_df.iloc[idx_test]
 	df_used = normalized_df.iloc[idx_used]
 
-	#count
+	#Count the number of observations in each box of the quantile grid
 	matrix_count = np.zeros((6,6))
 	list_idx = []
 	arr = np.array(df_used[['adult_mortality','life_expec']])
@@ -65,38 +61,37 @@ for n in range(n_loop):
 		    list_idx.append(elem)
 	matrix_prop = matrix_count / matrix_count.sum()
 
-	#data sampling
+	#Data sampling
 	vec = np.array(df_used)
 	Z_S = prob_source(vec, df_used.shape[0], weight, list_idx)
 	Z_T = np.array(df_used)
 	Z_test = np.array(df_test)
 
-	#instantiate Optimization class
+	#Instantiate Optimization class
 	optim = Optimization(mu)
 
 	#compute empirical moments
 	optim.compute_empirical_moments(Z_S,matrix)
 
-	#estimate alpha
+	#Estimate alpha
 	alpha_list = []
 	psi_list = []
 	for i in range(n_repet):
 		res = optim.estimation()
-		#res = minimize(psi_emp,np.random.randn(2),jac=grad_psi_emp,method='BFGS')
 		alpha_list.append(res)
 		psi_list.append(optim.psi_emp(res))
 		idx = np.argmin(psi_list)
 		alpha_emp = alpha_list[idx]
 
-	#compute radon weights
+	#Compute radon weights
 	weight_emp = np.array([ alpha_emp.T @ matrix(elem) @ alpha_emp for elem in Z_S ])
 
-	#data for learning
+	#Data for learning
 	X_S, y_S = Z_S[:,:2], Z_S[:,2]
 	X_T, y_T = Z_T[:,:2], Z_T[:,2]
 	X_test, y_test = Z_test[:,:2], Z_test[:,2]
 
-	#learning linear regression
+	#Learning linear regression
 	lin1 = LinearRegression()
 	lin1.fit(X_S,y_S,weight_emp)
 
@@ -116,7 +111,7 @@ for n in range(n_loop):
 
 	scores_lin.append([mse1,mse2,mse3])
 
-	#learning svr with different C parameters
+	#learning SVR with different C parameters
 	grid = [0.001,0.01,0.1,1.,10.]
 	for C in grid:
 		svm1 = SVR(C=C)
@@ -143,7 +138,7 @@ for n in range(n_loop):
 df_scores_lin = pd.DataFrame(scores_lin)
 df_scores_svr = pd.DataFrame(scores_svr)
 
-df_scores_lin.to_csv('transfer_expec_lin_{}_{}.csv'.format(n_loop,n_repet), index=False)
-df_scores_svr.to_csv('transfer_expec_svr_{}_{}.csv'.format(n_loop,n_repet), index=False)
+df_scores_lin.to_csv('transfer_expec_lin_{}_{}_difmat.csv'.format(n_loop,n_repet), index=False)
+df_scores_svr.to_csv('transfer_expec_svr_{}_{}_difmat.csv'.format(n_loop,n_repet), index=False)
 
 

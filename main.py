@@ -166,23 +166,23 @@ for i in range(param.n_loop):
 									 criterion='mse', 
 									 max_depth=param.max_depth)
 		rf2.fit(X_T,y_T)
-		time_fit_T = time() - time_fit_Rw
+		time_fit_T = time() - time_fit_Rw + time_erm_fit0
 
 		rf3 = RandomForestRegressor(param.n_estimators, 
 									 criterion='mse', 
 									 max_depth=param.max_depth)
 		rf3.fit(X_S,y_S)
-		time_fit_S = time() - time_fit_T
+		time_fit_S = time() - time_fit_T - time_fit_Rw + time_erm_fit0
 
 		time_erm_predict0 = time()
 		y_pred_1 = rf1.predict(X_test)
 		time_predict_Rw = time() - time_erm_predict0
 
 		y_pred_2 = rf2.predict(X_test)
-		time_predict_T = time() - time_predict_Rw
+		time_predict_T = time() - time_predict_Rw + time_erm_predict0
 
 		y_pred_3 = rf3.predict(X_test)
-		time_predict_S = time() - time_predict_T
+		time_predict_S = time() - time_predict_T - time_predict_T  + time_erm_predict0
 
 		mse1 = mean_squared_error(y_test,y_pred_1)
 		mse2 = mean_squared_error(y_test,y_pred_2)
@@ -195,21 +195,21 @@ for i in range(param.n_loop):
 
 		lin2 = LinearRegression()
 		lin2.fit(X_T,y_T)
-		time_fit_T = time() - time_fit_Rw
+		time_fit_T = time() - time_fit_Rw - time_erm_fit0
 
 		lin3 = LinearRegression()
 		lin3.fit(X_S,y_S)
-		time_fit_S = time() - time_fit_T
+		time_fit_S = time() - time_fit_T - time_fit_Rw - time_erm_fit0
 
 		time_erm_predict0 = time()
 		y_pred_1 = lin1.predict(X_test)
 		time_predict_Rw = time() - time_erm_predict0
 
 		y_pred_2 = lin2.predict(X_test)
-		time_predict_T = time() - time_predict_Rw
+		time_predict_T = time() - time_predict_Rw - time_erm_predict0
 
 		y_pred_3 = lin3.predict(X_test)
-		time_predict_S = time() - time_predict_T
+		time_predict_S = time() - time_predict_T - time_predict_Rw - time_erm_predict0
 
 		mse1 = mean_squared_error(y_test,y_pred_1)
 		mse2 = mean_squared_error(y_test,y_pred_2)
