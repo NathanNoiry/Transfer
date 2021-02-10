@@ -138,7 +138,7 @@ for n in range(n_loop):
 df_scores_lin = pd.DataFrame(scores_lin)
 df_scores_svr = pd.DataFrame(scores_svr)
 
-df_scores_lin.to_csv('transfer_expec_lin_{}_{}_difmat.csv'.format(n_loop,n_repet), index=False)
-df_scores_svr.to_csv('transfer_expec_svr_{}_{}_difmat.csv'.format(n_loop,n_repet), index=False)
+df_scores_lin.to_csv('./results/transfer_expec_lin_{}_{}_difmat.csv'.format(n_loop,n_repet), index=False)
+df_scores_svr.to_csv('./results/transfer_expec_svr_{}_{}_difmat.csv'.format(n_loop,n_repet), index=False)
 
 

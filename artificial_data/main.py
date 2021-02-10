@@ -240,9 +240,9 @@ df_time.columns = ['data_gen', 'est_alpha', 'time_weight',
 				   'fit_Rw', 'fit_T', 'fit_S',
 				   'pred_Rw', 'pred_T', 'pred_S']
 
-df.to_csv('./results/transfer_{}_{}_{}_{}_{}_{}_binit.csv'.format(ml_algo,
+df.to_csv('./results/transfer_{}_{}_{}_{}_{}_{}.csv'.format(ml_algo,
 	mc_size,sample_size,sub_sample_size,param.n_loop,n_repet), 
 	index=False)
-df_time.to_csv('./results/transfer_times_{}_{}_{}_{}_{}_{}_binit.csv'.format(ml_algo,
+df_time.to_csv('./results/transfer_times_{}_{}_{}_{}_{}_{}.csv'.format(ml_algo,
 	mc_size,sample_size,sub_sample_size,param.n_loop,n_repet), 
 	index=False)

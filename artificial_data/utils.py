@@ -45,6 +45,10 @@ class Generator(object):
     
     prob_target
 
+    compute_moments
+
+    plot_marginals
+
     """
 
     def __init__(self, mc_size, w, alpha, matrix):
@@ -150,6 +154,8 @@ class Optimization(object):
 
     Methods
     -------
+    compute_empirical_moments
+
     psi_emp
 
     grad_psi_emp
