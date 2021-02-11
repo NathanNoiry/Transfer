@@ -2,8 +2,8 @@
 
 Companion code for the paper Transfer Learning: A Semi-Parametric Approach. Two numerical experiments are available.
 
-<h2>Articifial Data</h2>
-One can tune the paramaters of the model in the parameters.py file.
+<h2>Artificial Data</h2>
+One can tune the parameters of the model in the parameters.py file.
 Run the main.py file to obtain the results, which will be stored in the "results" directory (in csv format).
 
 <h2>Life Expectancy Dataset</h2>
