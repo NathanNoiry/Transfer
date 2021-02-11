@@ -128,27 +128,27 @@ for i in range(param.n_loop):
 
 	time_erm_fit0 = time()
 
-	if ml_algo == 'svm':
-		svm1 = SVR()
-		svm1.fit(X_S,y_S,weight_emp)
+	if ml_algo == 'svr':
+		svr1 = SVR()
+		svr1.fit(X_S,y_S,weight_emp)
 		time_fit_Rw = time() - time_erm_fit0
 
-		svm2 = SVR()
-		svm2.fit(X_T,y_T)
+		svr2 = SVR()
+		svr2.fit(X_T,y_T)
 		time_fit_T = time() - time_fit_Rw
 
-		svm3 = SVR()
-		svm3.fit(X_S,y_S)
+		svr3 = SVR()
+		svr3.fit(X_S,y_S)
 		time_fit_S = time() - time_fit_T
 
 		time_erm_predict0 = time()
-		y_pred_1 = svm1.predict(X_test)
+		y_pred_1 = svr1.predict(X_test)
 		time_predict_Rw = time() - time_erm_predict0
 
-		y_pred_2 = svm2.predict(X_test)
+		y_pred_2 = svr2.predict(X_test)
 		time_predict_T = time() - time_predict_Rw
 
-		y_pred_3 = svm3.predict(X_test)
+		y_pred_3 = svr3.predict(X_test)
 		time_predict_S = time() - time_predict_T
 
 		mse1 = mean_squared_error(y_test,y_pred_1)

@@ -114,18 +114,18 @@ for n in range(n_loop):
 	#learning SVR with different C parameters
 	grid = [0.001,0.01,0.1,1.,10.]
 	for C in grid:
-		svm1 = SVR(C=C)
-		svm1.fit(X_S,y_S,weight_emp)
+		svr1 = SVR(C=C)
+		svr1.fit(X_S,y_S,weight_emp)
 
-		svm2 = SVR(C=C)
-		svm2.fit(X_T,y_T)
+		svr2 = SVR(C=C)
+		svr2.fit(X_T,y_T)
 
-		svm3 = SVR(C=C)
-		svm3.fit(X_S,y_S)
+		svr3 = SVR(C=C)
+		svr3.fit(X_S,y_S)
 
-		y_pred_1 = svm1.predict(X_test)
-		y_pred_2 = svm2.predict(X_test)
-		y_pred_3 = svm3.predict(X_test)
+		y_pred_1 = svr1.predict(X_test)
+		y_pred_2 = svr2.predict(X_test)
+		y_pred_3 = svr3.predict(X_test)
 
 		mse1 = mean_squared_error(y_test,y_pred_1)
 		mse2 = mean_squared_error(y_test,y_pred_2)

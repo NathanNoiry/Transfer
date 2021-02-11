@@ -16,7 +16,7 @@ optim_method = optim_choices[1]
 
 
 #choose the ml algorithm
-algo_choices = ['ols','svm','rf']
+algo_choices = ['ols','svr','rf']
 ml_algo = algo_choices[0]
 
 #parameters for ml_algo = 'rf'
